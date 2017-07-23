@@ -1,0 +1,64 @@
+@import "include.less";
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+  color: @dark-gray;
+  background-color: @platinum;
+  user-select: none;
+}
+
+textarea {
+  font-size: 14px;
+  color: @dark-gray;
+  border: none;
+  overflow: auto;
+  outline: none;
+  box-shadow: none;
+  resize: none;
+
+  &::placeholder {
+    color: @gray;
+  }
+}
+
+input {
+  font-size: 14px;
+  color: @dark-gray;
+  border: 1px solid @primary;
+  border-radius: 3px;
+  outline: none;
+  width: 100%;
+  padding: 8px 12px;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: @gray;
+  }
+}
+
+h2 {
+  font-size: 14px;
+  font-weight: @weight-bolder;
+  color: @dark-gray;
+  margin: 0 0 16px;
+}
+
+.button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  color: @white;
+  background-color: @primary;
+  border-radius: 3px;
+  border: 0;
+  padding: 0;
+  outline: 0;
+
+  &.disabled {
+    color: @gray;
+    background-color: @light-gray;
+  }
+}
