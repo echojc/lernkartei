@@ -1,8 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 
-import { App } from './components/App';
-
 import './index.less';
 
 const rootEl = document.getElementById('root');
@@ -27,6 +25,7 @@ if (__DEV__) {
   // const { appState } = require('./state/state');
   // window.state = appState;
 } else {
+  const App = require('./components/App').App;
 /* tslint:enable */
 // -- HOT RELOAD SUPPORT -- //
   ReactDOM.render(<App />, rootEl);

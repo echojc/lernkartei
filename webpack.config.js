@@ -8,17 +8,18 @@ var StyleLintWebpackPlugin = require('stylelint-webpack-plugin');
 module.exports = {
   entry: [
     'react-hot-loader/patch',
-    'webpack-dev-server/client?http://localhost:3000', // WebpackDevServer host and port
-    'webpack/hot/only-dev-server', // 'only' prevents reload on syntax errors
     './src/index.tsx',
   ],
 
   output: {
-    path: path.resolve(__dirname, 'dist.dev'),
     filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist.dev'),
+    publicPath: '/',
   },
 
   plugins: [
+    new webpack.HotModuleReplacementPlugin(),
+    new webpack.NamedModulesPlugin(),
     new webpack.DefinePlugin({
       __DEV__: true,
     }),
@@ -39,53 +40,54 @@ module.exports = {
 
   resolve: {
     // Add '.ts' and '.tsx' as resolvable extensions.
-    extensions: ['', '.ts', '.tsx', '.js'],
+    extensions: ['.ts', '.tsx', '.js'],
   },
 
   module: {
-    loaders: [
+    rules: [
+      {
+        test: /\.less$/,
+        include: path.resolve(__dirname, 'src'),
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true,
+              sourceMap: true,
+              camelCase: true,
+              namedExport: true,
+              localIdentName: '__[name]--[local]',
+            },
+          },
+          'autoprefixer-loader',
+          'less-loader',
+        ],
+      },
       {
         test: /\.tsx?$/,
         include: path.resolve(__dirname, 'src'),
-        loaders: [
+        use: [
           'react-hot-loader/webpack',
           'ts-loader',
         ],
       },
       {
-        test: /\.less$/,
+        test: /\.tsx?$/,
         include: path.resolve(__dirname, 'src'),
-        loaders: [
-          'style',
-          'css',
-          'autoprefixer',
-          'less',
+        enforce: 'pre',
+        use: [
+          'tslint-loader',
         ],
       },
       {
         test: /\.(svg|json)$/,
         include: path.resolve(__dirname, 'src'),
-        loaders: [
-          'raw',
+        use: [
+          'raw-loader',
         ],
       },
     ],
-    preLoaders: [
-      {
-        test: /\.tsx?$/,
-        include: path.resolve(__dirname, 'src'),
-        loaders: [
-          'tslint',
-        ],
-      },
-    ],
-    noParse: [
-      /node_modules\/ajv\/dist\/ajv\.bundle\.js/,
-    ],
-  },
-
-  tslint: {
-    emitErrors: true,
   },
 
   // When importing a module whose path matches one of the following, just
@@ -103,6 +105,7 @@ module.exports = {
   },
 
   devServer: {
+    hot: true,
     proxy: {
       '/api': {
         target: 'http://localhost:3000',
