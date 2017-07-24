@@ -7,9 +7,9 @@ const rootEl = document.getElementById('root');
 
 // -- HOT RELOAD SUPPORT -- //
 /* tslint:disable */
-declare var __DEV__: boolean;
-declare var module: { hot: any };
-declare var require: { (path: string): any; };
+declare const __DEV__: boolean;
+declare const module: { hot: any };
+declare const require: { (path: string): any; };
 if (__DEV__) {
   const { AppContainer } = require('react-hot-loader');
   const renderApp = () => {
