@@ -95,6 +95,10 @@ func extractDefinitions(e entry) ([]string, error) {
 	for _, n := range sel.Select(e.definitions) {
 		out = append(out, text(n))
 	}
+
+	if len(out) < 4 {
+		return out, nil
+	}
 	return out[:4], nil
 }
 
