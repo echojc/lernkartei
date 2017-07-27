@@ -38,7 +38,7 @@ var (
 	regexpVerbThirdPerson = regexp.MustCompile("er (.*)")
 )
 
-func NewWord(word string) ([]dict.Word, error) {
+func Lookup(word string) ([]dict.Word, error) {
 	c := http.Client{
 		Timeout: 10 * time.Second,
 	}

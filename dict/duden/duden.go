@@ -44,7 +44,7 @@ var (
 	baseURL = "http://www.duden.de/rechtschreibung"
 )
 
-func NewWord(word string) (w dict.Word, err error) {
+func Lookup(word string) (w dict.Word, err error) {
 	c := http.Client{
 		Timeout: 10 * time.Second,
 	}
