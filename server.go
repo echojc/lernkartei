@@ -66,7 +66,10 @@ func lookup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Add("Content-Type", "application/json")
+	h := w.Header()
+	h.Add("Content-Type", "application/json")
+	h.Add("Access-Control-Allow-Origin", "*")
+
 	w.WriteHeader(http.StatusOK)
 	w.Write(bs)
 }
