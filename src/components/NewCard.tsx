@@ -8,7 +8,17 @@ import * as api from 'api/word';
 
 import * as styles from './newCard.less';
 
-function renderResult(r: api.Result): React.ReactElement<{}> {
+interface Props {
+  add: (front: string, back: string[]) => void;
+}
+
+interface State {
+  input: string;
+  pending: boolean;
+  results: api.Result[] | null;
+}
+
+const renderResult = (add: (r: api.Result) => void) => (r: api.Result): React.ReactElement<{}> => {
   const forms = r.Forms.length > 0
     ? `(${r.Forms.join(', ')})`
     : null;
@@ -22,24 +32,24 @@ function renderResult(r: api.Result): React.ReactElement<{}> {
     : null;
 
   return (
-    <section className={styles.result} key={r.Base + r.PartOfSpeech}>
+    <section
+      key={r.Base + r.PartOfSpeech}
+      className={styles.result}
+      onClick={() => add(r)}
+    >
       <dl>
         <dt>{r.Base} <span className={styles.extended}>{pos} {forms}</span></dt>
         <dd>{defs}</dd>
       </dl>
     </section>
   );
-}
+};
 
-interface State {
-  pending: boolean;
-  results: api.Result[] | null;
-}
-
-export class NewCard extends React.Component<{}, State> {
+export class NewCard extends React.Component<Props, State> {
   inflight: Promise<void>;
 
   state: State = {
+    input: '',
     pending: false,
     results: null,
   };
@@ -59,8 +69,13 @@ export class NewCard extends React.Component<{}, State> {
     this.inflight = current;
   }, 500);
 
+  add = (r: api.Result) => {
+    this.props.add(r.Definitions[0] || '(unknown)', r.Forms);
+    this.setState({ input: '', results: null, pending: false });
+  }
+
   render() {
-    const { results } = this.state;
+    const { results, input } = this.state;
     return (
       <Card
         front={
@@ -68,20 +83,22 @@ export class NewCard extends React.Component<{}, State> {
             <input
               className={styles.input}
               placeholder={'Suchen...'}
+              value={input}
               onChange={(e) => {
                 const term = e.target.value;
                 if (term !== '') {
                   this.search(term);
+                  this.setState({ input: term });
                 } else {
                   this.search.cancel();
-                  this.setState({ results: null });
+                  this.setState({ input: '', results: null, pending: false });
                 }
               }}
             />
             <div className={classNames(styles.results, { [styles.hasResults]: !!results })}>
               {results && (
                 results.length > 0
-                  ? results.map(renderResult)
+                  ? results.map(renderResult(this.add))
                   : <div className={styles.result}>
                       <dl>
                         <dd>No results</dd>
