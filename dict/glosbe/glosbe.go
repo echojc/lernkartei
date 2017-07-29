@@ -147,7 +147,9 @@ func extractVerbForms(n *html.Node) ([]string, error) {
 
 		// found table, range over rows to find things we want
 		index := -1
-		out := []string{"", "", " "}
+		out := make([]string, 2)
+		pastParticiple := ""
+		auxilliary := ""
 		for _, r := range sel.MatchAll(n) {
 			var first, last *html.Node
 			for first = r.FirstChild; first.Type != html.ElementNode; first = first.NextSibling {
@@ -160,9 +162,9 @@ func extractVerbForms(n *html.Node) ([]string, error) {
 
 			switch true {
 			case strings.Contains(keyword, keywordPastParticiple):
-				out[2] = data + out[2]
+				pastParticiple = data
 			case strings.Contains(keyword, keywordAuxilliary):
-				out[2] = out[2] + data
+				auxilliary = data
 			case strings.Contains(keyword, keywordPresent):
 				index = 0
 			case strings.Contains(keyword, keywordPreterite):
@@ -175,8 +177,16 @@ func extractVerbForms(n *html.Node) ([]string, error) {
 			}
 		}
 
+		if pastParticiple != "" {
+			if strings.Contains(auxilliary, "haben") {
+				out = append(out, fmt.Sprintf("%s %s", pastParticiple, "haben"))
+			}
+			if strings.Contains(auxilliary, "sein") {
+				out = append(out, fmt.Sprintf("%s %s", pastParticiple, "sein"))
+			}
+		}
+
 		for i := len(out) - 1; i >= 0; i-- {
-			out[i] = strings.TrimSpace(out[i])
 			if out[i] == "" {
 				out = append(out[0:i], out[i+1:]...)
 			}
