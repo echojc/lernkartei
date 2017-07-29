@@ -7,6 +7,7 @@ import * as styles from './wordCard.less';
 interface Props {
   front: string | string[];
   back: string | string[];
+  disableAnimate: boolean;
 }
 
 function renderWords(words: string | string[]): React.ReactElement<{}> {
@@ -22,11 +23,12 @@ function renderWords(words: string | string[]): React.ReactElement<{}> {
 
 export class WordCard extends React.Component<Props, {}> {
   render() {
-    const { front, back } = this.props;
+    const { front, back, disableAnimate } = this.props;
     return (
       <Card
         front={renderWords(front)}
         back={renderWords(back)}
+        disableEnter={disableAnimate}
       />
     );
   }

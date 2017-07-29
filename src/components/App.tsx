@@ -6,6 +6,7 @@ import { WordCard } from 'components/WordCard';
 interface Card {
   front: string;
   back: string[];
+  isNew: boolean;
 }
 
 interface State {
@@ -15,15 +16,15 @@ interface State {
 export class App extends React.Component<{}, {}> {
   state: State = {
     cards: [
-      { front: 'go',   back: ['gehen', 'geht', 'ging', 'gegangen'] },
-      { front: 'good', back: ['gut', 'besser', 'am besten'] },
-      { front: 'dog',  back: ['der Hund', 'die Hunde'] },
+      { isNew: false, front: 'go',   back: ['gehen', 'geht', 'ging', 'gegangen'] },
+      { isNew: false, front: 'good', back: ['gut', 'besser', 'am besten'] },
+      { isNew: false, front: 'dog',  back: ['der Hund', 'die Hunde'] },
     ],
   };
 
   add = (front: string, back: string[]) => {
     const { cards } = this.state;
-    this.setState({ cards: [{ front, back }].concat(cards) });
+    this.setState({ cards: [{ isNew: true, front, back }].concat(cards) });
   }
 
   render() {
@@ -33,7 +34,7 @@ export class App extends React.Component<{}, {}> {
         <main>
           <NewCard add={this.add} />
           {cards.map(card => (
-            <WordCard key={card.back.join()} front={card.front} back={card.back} />
+            <WordCard key={card.back.join()} front={card.front} back={card.back} disableAnimate={!card.isNew} />
           ))}
         </main>
       </div>
