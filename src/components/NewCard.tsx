@@ -70,9 +70,9 @@ export class NewCard extends React.Component<Props, State> {
   }, 500);
 
   add = (r: api.Result) => {
-    const forms = r.PartOfSpeech === 'Verb'
-      ? [r.Base].concat(r.Forms)
-      : r.Forms;
+    const forms = r.PartOfSpeech === 'Noun'
+      ? r.Forms
+      : [r.Base].concat(r.Forms);
 
     this.props.add(r.Definitions[0] || '(unknown)', forms);
     this.setState({ input: '', results: null, pending: false });
