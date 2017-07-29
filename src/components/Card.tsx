@@ -1,3 +1,4 @@
+import * as classNames from 'classnames';
 import * as React from 'react';
 
 import * as styles from './card.less';
@@ -8,7 +9,7 @@ interface Props {
 }
 
 interface State {
-  isFront: boolean;
+  isFlipped: boolean;
 }
 
 function renderWords(words: string | string[]) {
@@ -18,21 +19,23 @@ function renderWords(words: string | string[]) {
 
 export class Card extends React.Component<Props, State> {
   state = {
-    isFront: true,
+    isFlipped: false,
   };
 
   render() {
+    const { front, back } = this.props;
+    const { isFlipped } = this.state;
+
     return (
-      <section className={styles.cardContainer}>
-        <article
-          className={styles.card}
-          onClick={() => this.setState({ isFront: !this.state.isFront })}
+      <article className={styles.container}>
+        <section
+          className={classNames(styles.card, { [styles.flipped]: isFlipped })}
+          onClick={() => this.setState({ isFlipped: !isFlipped })}
         >
-          <div>
-            {renderWords(this.state.isFront ? this.props.front : this.props.back)}
-          </div>
-        </article>
-      </section>
+          <div className={styles.front}>{renderWords(front)}</div>
+          <div className={styles.back}>{renderWords(back)}</div>
+        </section>
+      </article>
     );
   }
 }

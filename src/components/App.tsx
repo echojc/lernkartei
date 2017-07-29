@@ -7,7 +7,7 @@ export class App extends React.Component<{}, {}> {
     return (
       <div>
         <main>
-          <Card front={'go'} back={['gehen', 'geht', 'gang', 'gegangen']} />
+          <Card front={'go'} back={['gehen', 'geht', 'ging', 'gegangen']} />
           <Card front={'good'} back={['gut', 'besser', 'am besten']} />
           <Card front={'dog'} back={['der Hund', 'die Hunde']} />
         </main>
