@@ -5,7 +5,8 @@ import * as styles from './card.less';
 
 interface Props {
   front: React.ReactElement<{}> | React.ReactElement<{}>[];
-  back: React.ReactElement<{}> | React.ReactElement<{}>[];
+  back?: React.ReactElement<{}> | React.ReactElement<{}>[];
+  disableFlip?: boolean;
 }
 
 interface State {
@@ -18,14 +19,14 @@ export class Card extends React.Component<Props, State> {
   };
 
   render() {
-    const { front, back } = this.props;
+    const { front, back, disableFlip } = this.props;
     const { isFlipped } = this.state;
 
     return (
       <article className={styles.container}>
         <section
           className={classNames(styles.card, { [styles.flipped]: isFlipped })}
-          onClick={() => this.setState({ isFlipped: !isFlipped })}
+          onClick={() => !disableFlip && this.setState({ isFlipped: !isFlipped })}
         >
           <div className={styles.front}>{front}</div>
           <div className={styles.back}>{back}</div>
