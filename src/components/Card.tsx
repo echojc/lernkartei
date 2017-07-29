@@ -4,17 +4,12 @@ import * as React from 'react';
 import * as styles from './card.less';
 
 interface Props {
-  front: string | string[];
-  back: string | string[];
+  front: React.ReactElement<{}> | React.ReactElement<{}>[];
+  back: React.ReactElement<{}> | React.ReactElement<{}>[];
 }
 
 interface State {
   isFlipped: boolean;
-}
-
-function renderWords(words: string | string[]) {
-  const normalized = Array.isArray(words) ? words : [words];
-  return normalized.map(word => (<div key={word}>{word}</div>));
 }
 
 export class Card extends React.Component<Props, State> {
@@ -32,8 +27,8 @@ export class Card extends React.Component<Props, State> {
           className={classNames(styles.card, { [styles.flipped]: isFlipped })}
           onClick={() => this.setState({ isFlipped: !isFlipped })}
         >
-          <div className={styles.front}>{renderWords(front)}</div>
-          <div className={styles.back}>{renderWords(back)}</div>
+          <div className={styles.front}>{front}</div>
+          <div className={styles.back}>{back}</div>
         </section>
       </article>
     );

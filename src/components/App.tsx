@@ -1,15 +1,15 @@
 import * as React from 'react';
 
-import { Card } from 'components/Card';
+import { WordCard } from 'components/WordCard';
 
 export class App extends React.Component<{}, {}> {
   render() {
     return (
       <div>
         <main>
-          <Card front={'go'} back={['gehen', 'geht', 'ging', 'gegangen']} />
-          <Card front={'good'} back={['gut', 'besser', 'am besten']} />
-          <Card front={'dog'} back={['der Hund', 'die Hunde']} />
+          <WordCard front={'go'} back={['gehen', 'geht', 'ging', 'gegangen']} />
+          <WordCard front={'good'} back={['gut', 'besser', 'am besten']} />
+          <WordCard front={'dog'} back={['der Hund', 'die Hunde']} />
         </main>
       </div>
     );
