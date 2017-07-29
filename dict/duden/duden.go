@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/andybalholm/cascadia"
 	"github.com/echojc/lernkartei/dict"
-	"github.com/ericchiang/css"
 
 	"golang.org/x/net/html"
 )
@@ -74,7 +74,7 @@ func Lookup(word string) (w dict.Word, err error) {
 }
 
 func extractBase(root *html.Node) (string, error) {
-	sel, err := css.Compile("h1")
+	sel, err := cascadia.Compile("h1")
 	if err != nil {
 		return "", err
 	}
@@ -88,12 +88,12 @@ func extractBase(root *html.Node) (string, error) {
 }
 
 func extractPartOfSpeech(root *html.Node) (dict.PartOfSpeech, error) {
-	sel, err := css.Compile("strong.lexem")
+	sel, err := cascadia.Compile("strong.lexem")
 	if err != nil {
 		return "", err
 	}
 
-	for _, n := range sel.Select(root) {
+	for _, n := range sel.MatchAll(root) {
 		s := text(n)
 		switch true {
 		case strings.Contains(s, keywordNoun):
@@ -127,7 +127,7 @@ func extractForms(root *html.Node, pos dict.PartOfSpeech) ([]string, error) {
 }
 
 func extractAdjectiveForms(g *html.Node) ([]string, error) {
-	sel, err := css.Compile(".lexem")
+	sel, err := cascadia.Compile(".lexem")
 	if err != nil {
 		return nil, err
 	}
@@ -146,12 +146,12 @@ func extractAdjectiveForms(g *html.Node) ([]string, error) {
 }
 
 func extractNounForms(g *html.Node) ([]string, error) {
-	sel, err := css.Compile("tbody tr")
+	sel, err := cascadia.Compile("tbody tr")
 	if err != nil {
 		return nil, err
 	}
 
-	for _, n := range sel.Select(g) {
+	for _, n := range sel.MatchAll(g) {
 		c := n.FirstChild
 		if strings.Contains(text(c), keywordNominative) {
 			var out []string
@@ -171,12 +171,12 @@ func extractVerbForms(g *html.Node) ([]string, error) {
 		return nil, err
 	}
 
-	sel, err := css.Compile("tbody")
+	sel, err := cascadia.Compile("tbody")
 	if err != nil {
 		return nil, err
 	}
 
-	n := sel.Select(g)
+	n := sel.MatchAll(g)
 	if len(n) != 3 {
 		return nil, ErrNoVerbForms
 	}
@@ -217,7 +217,7 @@ func extractVerbForms(g *html.Node) ([]string, error) {
 }
 
 func extractAuxilliary(g *html.Node) (string, error) {
-	sel, err := css.Compile(".lexem")
+	sel, err := cascadia.Compile(".lexem")
 	if err != nil {
 		return "", err
 	}
@@ -259,12 +259,12 @@ func text(n *html.Node) string {
 }
 
 func grammarNode(root *html.Node) (*html.Node, error) {
-	sel, err := css.Compile("h2")
+	sel, err := cascadia.Compile("h2")
 	if err != nil {
 		return nil, err
 	}
 
-	for _, n := range sel.Select(root) {
+	for _, n := range sel.MatchAll(root) {
 		if strings.Contains(text(n), keywordGrammar) {
 			// search up for the nearest <section>
 			for !(n == nil || (n.Data == "section" && n.Type == html.ElementNode)) {
@@ -277,8 +277,8 @@ func grammarNode(root *html.Node) (*html.Node, error) {
 	return nil, ErrNoGrammar
 }
 
-func exactlyOne(sel *css.Selector, n *html.Node) (*html.Node, error) {
-	ns := sel.Select(n)
+func exactlyOne(sel *cascadia.Selector, n *html.Node) (*html.Node, error) {
+	ns := sel.MatchAll(n)
 	if len(ns) > 1 {
 		return nil, ErrTooManyNodes
 	} else if len(ns) == 0 {

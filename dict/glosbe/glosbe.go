@@ -9,16 +9,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/andybalholm/cascadia"
 	"github.com/echojc/lernkartei/dict"
-	"github.com/ericchiang/css"
 	"golang.org/x/net/html"
 )
 
 const (
-	keywordComparative    = "Comparative forms"
-	keywordSuperlative    = "Superlative forms"
+	keywordComparative    = "comparative forms"
+	keywordSuperlative    = "superlative forms"
 	keywordPredicative    = "predicative"
-	keywordConjugation    = "Conjugation of"
+	keywordConjugation    = "conjugation of"
 	keywordPastParticiple = "past participle"
 	keywordAuxilliary     = "auxiliary"
 	keywordPresent        = "present"
@@ -87,13 +87,13 @@ func extractDefinitions(e entry) ([]string, error) {
 		return nil, ErrNoDefinitions
 	}
 
-	sel, err := css.Compile("li strong")
+	sel, err := cascadia.Compile("li strong")
 	if err != nil {
 		return nil, err
 	}
 
 	var out []string
-	for _, n := range sel.Select(e.definitions) {
+	for _, n := range sel.MatchAll(e.definitions) {
 		out = append(out, text(n))
 	}
 
@@ -104,52 +104,40 @@ func extractDefinitions(e entry) ([]string, error) {
 }
 
 func extractPartOfSpeech(e entry) (dict.PartOfSpeech, error) {
-	if e.grammar == nil {
-		return "", ErrUnknownPartOfSpeech
-	}
-
-	for n := e.grammar.FirstChild; n != nil; n = n.NextSibling {
-		switch strings.TrimSpace(n.FirstChild.Data) {
-		case "verb":
-			return dict.Verb, nil
-		case "noun":
-			return dict.Noun, nil
-		case "adjective":
-			return dict.Adjective, nil
-		}
+	switch strings.TrimSpace(e.grammar.FirstChild.Data) {
+	case "verb":
+		return dict.Verb, nil
+	case "noun":
+		return dict.Noun, nil
+	case "adjective":
+		return dict.Adjective, nil
 	}
 
 	return "", ErrUnknownPartOfSpeech
 }
 
 func extractForms(e entry) ([]string, error) {
-	if e.grammar == nil {
-		return nil, ErrUnknownPartOfSpeech
-	}
-
-	for n := e.grammar.FirstChild; n != nil; n = n.NextSibling {
-		switch strings.TrimSpace(n.FirstChild.Data) {
-		case "adjective":
-			return extractAdjectiveForms(n)
-		case "noun":
-			return extractNounForms(n)
-		case "verb":
-			return extractVerbForms(n)
-		}
+	switch strings.TrimSpace(e.grammar.FirstChild.Data) {
+	case "adjective":
+		return extractAdjectiveForms(e.grammar)
+	case "noun":
+		return extractNounForms(e.grammar)
+	case "verb":
+		return extractVerbForms(e.grammar)
 	}
 
 	return nil, ErrUnknownPartOfSpeech
 }
 
 func extractVerbForms(n *html.Node) ([]string, error) {
-	sel, err := css.Compile("tr")
+	sel, err := cascadia.Compile("tr")
 	if err != nil {
 		return nil, err
 	}
 
 	nextTable := false
 	for n = n.FirstChild; n != nil; n = n.NextSibling {
-		if strings.Contains(n.Data, keywordConjugation) {
+		if strings.Contains(strings.ToLower(n.Data), keywordConjugation) {
 			nextTable = true
 		}
 
@@ -160,7 +148,7 @@ func extractVerbForms(n *html.Node) ([]string, error) {
 		// found table, range over rows to find things we want
 		index := -1
 		out := []string{"", "", " "}
-		for _, r := range sel.Select(n) {
+		for _, r := range sel.MatchAll(n) {
 			var first, last *html.Node
 			for first = r.FirstChild; first.Type != html.ElementNode; first = first.NextSibling {
 			}
@@ -186,6 +174,14 @@ func extractVerbForms(n *html.Node) ([]string, error) {
 				}
 			}
 		}
+
+		for i := len(out) - 1; i >= 0; i-- {
+			out[i] = strings.TrimSpace(out[i])
+			if out[i] == "" {
+				out = append(out[0:i], out[i+1:]...)
+			}
+		}
+
 		return out, nil
 	}
 
@@ -193,14 +189,14 @@ func extractVerbForms(n *html.Node) ([]string, error) {
 }
 
 func extractNounForms(n *html.Node) ([]string, error) {
-	sel, err := css.Compile("td + td")
+	sel, err := cascadia.Compile("td + td")
 	if err != nil {
 		return nil, err
 	}
 
 	// best effort: start from the second td and extract siblings
 	forms := []string{}
-	ns := sel.Select(n)
+	ns := sel.MatchAll(n)
 	if len(ns) == 0 {
 		return forms, nil
 	}
@@ -218,7 +214,7 @@ func extractNounForms(n *html.Node) ([]string, error) {
 }
 
 func extractAdjectiveForms(n *html.Node) ([]string, error) {
-	sel, err := css.Compile("td")
+	sel, err := cascadia.Compile("td")
 	if err != nil {
 		return nil, err
 	}
@@ -227,9 +223,9 @@ func extractAdjectiveForms(n *html.Node) ([]string, error) {
 	index := -1
 	for n = n.FirstChild; n != nil; n = n.NextSibling {
 		switch true {
-		case strings.Contains(n.Data, keywordComparative):
+		case strings.Contains(strings.ToLower(n.Data), keywordComparative):
 			index = 0
-		case strings.Contains(n.Data, keywordSuperlative):
+		case strings.Contains(strings.ToLower(n.Data), keywordSuperlative):
 			index = 1
 		}
 
@@ -237,13 +233,19 @@ func extractAdjectiveForms(n *html.Node) ([]string, error) {
 			continue
 		}
 
-		cell := sel.Select(n)[0]
+		cell := sel.MatchAll(n)[0]
 		matches := regexpAdjective.FindStringSubmatch(text(cell))
 		if matches == nil {
 			continue
 		}
 
 		forms[index] = strings.TrimSpace(matches[1])
+	}
+
+	for i := len(forms) - 1; i >= 0; i-- {
+		if forms[i] == "" {
+			forms = append(forms[0:i], forms[i+1:]...)
+		}
 	}
 
 	return forms, nil
@@ -256,25 +258,29 @@ type entry struct {
 }
 
 func extractEntries(root *html.Node) ([]entry, error) {
-	sel, err := css.Compile("#phraseTranslation h3")
+	sel, err := cascadia.Compile("#phraseTranslation .additional-data")
 	if err != nil {
 		return nil, err
 	}
 
 	var es []entry
-	for _, n := range sel.Select(root) {
-		var e entry
-		e.heading = n
-
-		for n = n.NextSibling; n != nil && !isTag(n, "h3"); n = n.NextSibling {
-			if isTag(n, "ul") {
-				e.definitions = n
-			} else if hasClass(n, "additional-data") {
-				e.grammar = n
+	for _, d := range sel.MatchAll(root) {
+		for n := d.FirstChild; n != nil; n = n.NextSibling {
+			switch strings.TrimSpace(n.FirstChild.Data) {
+			case "verb", "adjective", "noun":
+				e := entry{
+					grammar: n,
+				}
+				for n2 := n.Parent.PrevSibling; n2 != nil && !hasClass(n2, "additional-data"); n2 = n2.PrevSibling {
+					if isTag(n2, "ul") {
+						e.definitions = n2
+					} else if isTag(n2, "h3") {
+						e.heading = n2
+					}
+				}
+				es = append(es, e)
 			}
 		}
-
-		es = append(es, e)
 	}
 
 	if es == nil {

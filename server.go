@@ -55,7 +55,11 @@ func lookup(w http.ResponseWriter, r *http.Request) {
 
 	out := []dict.Word{}
 	for _, word := range words {
-		words, _ := glosbe.Lookup(word)
+		words, err := glosbe.Lookup(word)
+		if err != nil {
+			log.Println(err)
+			continue
+		}
 		out = append(out, words...)
 	}
 
