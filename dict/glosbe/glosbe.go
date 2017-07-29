@@ -61,12 +61,13 @@ func Lookup(word string) ([]dict.Word, error) {
 	var ws []dict.Word
 	for _, e := range entries {
 		var w dict.Word
-		w.Base = extractBase(e)
-		if w.Base != word {
+		w.PartOfSpeech, _ = extractPartOfSpeech(e)
+		if w.PartOfSpeech == "" {
 			continue
 		}
+
+		w.Base = extractBase(e)
 		w.Definitions, _ = extractDefinitions(e)
-		w.PartOfSpeech, _ = extractPartOfSpeech(e)
 		w.Forms, _ = extractForms(e)
 		ws = append(ws, w)
 	}
@@ -192,27 +193,24 @@ func extractVerbForms(n *html.Node) ([]string, error) {
 }
 
 func extractNounForms(n *html.Node) ([]string, error) {
-	sel, err := css.Compile("td")
+	sel, err := css.Compile("td + td")
 	if err != nil {
 		return nil, err
 	}
 
-	// best effort extract
-	forms := make([]string, 2)
-	for i, n := range sel.Select(n) {
-		if i > 4 {
-			break
-		}
+	// best effort: start from the second td and extract siblings
+	forms := []string{}
+	ns := sel.Select(n)
+	if len(ns) == 0 {
+		return forms, nil
+	}
 
-		switch i {
-		case 1:
-			forms[0] = strings.TrimSpace(text(n))
-		case 2:
-			forms[0] = fmt.Sprintf("%s %s", forms[0], strings.TrimSpace(text(n)))
-		case 3:
-			forms[1] = strings.TrimSpace(text(n))
-		case 4:
-			forms[1] = fmt.Sprintf("%s %s", forms[1], strings.TrimSpace(text(n)))
+	for n, i := ns[0], 0; n != nil; n, i = nextElementSibling(n), i+1 {
+		s := strings.TrimSpace(text(n))
+		if len(forms) == i/2 {
+			forms = append(forms, s)
+		} else {
+			forms[i/2] += " " + s
 		}
 	}
 
@@ -284,6 +282,15 @@ func extractEntries(root *html.Node) ([]entry, error) {
 	}
 
 	return es, nil
+}
+
+func nextElementSibling(n *html.Node) *html.Node {
+	for n = n.NextSibling; n != nil; n = n.NextSibling {
+		if n.Type == html.ElementNode {
+			return n
+		}
+	}
+	return nil
 }
 
 func isTag(n *html.Node, tag string) bool {
