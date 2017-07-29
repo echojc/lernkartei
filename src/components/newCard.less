@@ -1,19 +1,24 @@
 @import "~include.less";
 
-.input {
-  font-size: 24px;
-  text-align: center;
-  width: 100%;
-  height: 54px;
-}
-
 .search {
   width: 100%;
 }
 
+.input {
+  font-size: 24px;
+  text-align: center;
+  width: 100%;
+  height: @search-input-height;
+}
+
 .results {
-  max-height: 280px;
   overflow: auto;
+  max-height: 0;
+  transition: max-height 0.3s;
+
+  &.hasResults {
+    max-height: @search-max-height;
+  }
 }
 
 .result {

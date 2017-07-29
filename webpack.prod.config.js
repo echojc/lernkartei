@@ -124,5 +124,6 @@ module.exports = {
     'react-router': 'ReactRouter',
     'mobx': 'mobx',
     'mobx-react': 'mobxReact',
+    'lodash': '_',
   },
 };
