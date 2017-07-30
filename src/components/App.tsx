@@ -13,6 +13,10 @@ interface State {
   cards: Card[];
 }
 
+function key(card: Card): string {
+  return card.front + card.back.join();
+}
+
 export class App extends React.Component<{}, {}> {
   state: State = {
     cards: [
@@ -34,7 +38,7 @@ export class App extends React.Component<{}, {}> {
         <main>
           <NewCard add={this.add} />
           {cards.map(card => (
-            <WordCard key={card.back.join()} front={card.front} back={card.back} disableAnimate={!card.isNew} />
+            <WordCard key={key(card)} front={card.front} back={card.back} disableAnimate={!card.isNew} />
           ))}
         </main>
       </div>
