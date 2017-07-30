@@ -1,6 +1,7 @@
+import { uniqBy } from 'lodash';
 import * as React from 'react';
 
-import { NewCard } from 'components/NewCard';
+import { Search } from 'components/Search';
 import { WordCard } from 'components/WordCard';
 
 interface Card {
@@ -36,8 +37,8 @@ export class App extends React.Component<{}, {}> {
     return (
       <div>
         <main>
-          <NewCard add={this.add} />
-          {cards.map(card => (
+          <Search add={this.add} />
+          {uniqBy(cards, key).map(card => (
             <WordCard key={key(card)} front={card.front} back={card.back} disableAnimate={!card.isNew} />
           ))}
         </main>

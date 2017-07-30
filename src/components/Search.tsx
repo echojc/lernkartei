@@ -2,11 +2,9 @@ import * as classNames from 'classnames';
 import { debounce } from 'lodash';
 import * as React from 'react';
 
-import { Card } from './Card';
-
 import * as api from 'api/word';
 
-import * as styles from './newCard.less';
+import * as styles from './search.less';
 
 interface Props {
   add: (front: string, back: string[]) => void;
@@ -45,7 +43,7 @@ const renderResult = (add: (r: api.Result) => void) => (r: api.Result): React.Re
   );
 };
 
-export class NewCard extends React.Component<Props, State> {
+export class Search extends React.Component<Props, State> {
   inflight: Promise<void> | null;
 
   state: State = {
@@ -82,40 +80,35 @@ export class NewCard extends React.Component<Props, State> {
   render() {
     const { results, input } = this.state;
     return (
-      <Card
-        front={
-          <div className={styles.search}>
-            <input
-              className={styles.input}
-              placeholder={'Suchen...'}
-              value={input}
-              onChange={(e) => {
-                const term = e.target.value;
-                if (term !== '') {
-                  this.search(term);
-                  this.setState({ input: term });
-                } else {
-                  this.inflight = null;
-                  this.search.cancel();
-                  this.setState({ input: '', results: null, pending: false });
-                }
-              }}
-            />
-            <div className={classNames(styles.results, { [styles.hasResults]: !!results })}>
-              {results && (
-                results.length > 0
-                  ? results.map(renderResult(this.add))
-                  : <div className={styles.result}>
-                      <dl>
-                        <dd>No results</dd>
-                      </dl>
-                    </div>
-              )}
-            </div>
+      <div className={styles.container}>
+        <div className={styles.search}>
+          <input
+            className={classNames(styles.input, { [styles.hasResults]: !!results })}
+            placeholder={'Suchen...'}
+            value={input}
+            onChange={(e) => {
+              const term = e.target.value;
+              if (term !== '') {
+                this.search(term);
+                this.setState({ input: term });
+              } else {
+                this.inflight = null;
+                this.search.cancel();
+                this.setState({ input: '', results: null, pending: false });
+              }
+            }}
+          />
+          <div className={styles.results}>
+            {results && (
+              results.length > 0
+                ? results.map(renderResult(this.add))
+                : <div className={styles.noResult}>
+                    No results
+                  </div>
+            )}
           </div>
-        }
-        disableFlip={true}
-      />
+        </div>
+      </div>
     );
   }
 }

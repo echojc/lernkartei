@@ -1,0 +1,78 @@
+@import "~include.less";
+
+.container {
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.search {
+  position: relative;
+  width: 100%;
+}
+
+.input {
+  font-size: 24px;
+  text-align: center;
+  width: 100%;
+  height: @search-input-height;
+  box-sizing: border-box;
+  border: 1px solid @light-gray;
+  border-radius: 3px;
+
+  &.has-results {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+}
+
+.results {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  width: 100%;
+  overflow: auto;
+  max-height: @search-max-height;
+  transition: max-height 0.3s;
+  z-index: 100;
+  background-color: @white;
+  box-sizing: border-box;
+  border: 1px solid @light-gray;
+  border-top: 0;
+  border-radius: 3px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+.result {
+  box-sizing: border-box;
+  padding: 0 20px;
+
+  & + .result {
+    border-top: 1px solid @light-gray;
+  }
+
+  dt {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+    font-size: 24px;
+
+    .extended {
+      color: @quicksilver;
+      font-size: 14px;
+    }
+  }
+
+  dd {
+    color: @medium-gray;
+    padding: 0;
+    margin: 0;
+  }
+}
+
+.no-result {
+  padding: 12px 20px;
+  color: @taupe;
+}
