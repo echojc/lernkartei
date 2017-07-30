@@ -17,7 +17,7 @@ interface State {
 }
 
 const renderResult = (add: (r: api.Result) => void) => (r: api.Result): React.ReactElement<{}> => {
-  const forms = r.Forms.length > 0
+  const forms = r.Forms && r.Forms.length > 0
     ? `(${r.Forms.join(', ')})`
     : null;
 
@@ -73,7 +73,8 @@ export class Search extends React.Component<Props, State> {
       ? r.Forms
       : [r.Base].concat(r.Forms);
 
-    this.props.add(r.Definitions[0] || '(unknown)', forms);
+    const def = (r.Definitions && r.Definitions[0]) || '(unknown)';
+    this.props.add(def, forms);
     this.setState({ input: '', results: null, pending: false });
   }
 

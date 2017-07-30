@@ -21,7 +21,7 @@ function key(card: Card): string {
 export class App extends React.Component<{}, {}> {
   state: State = {
     cards: [
-      { isNew: false, front: 'go',   back: ['gehen', 'geht', 'ging', 'gegangen'] },
+      { isNew: false, front: 'go',   back: ['gehen', 'geht', 'ging', 'gegangen sein'] },
       { isNew: false, front: 'good', back: ['gut', 'besser', 'am besten'] },
       { isNew: false, front: 'dog',  back: ['der Hund', 'die Hunde'] },
     ],
