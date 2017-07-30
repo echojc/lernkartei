@@ -46,7 +46,7 @@ const renderResult = (add: (r: api.Result) => void) => (r: api.Result): React.Re
 };
 
 export class NewCard extends React.Component<Props, State> {
-  inflight: Promise<void>;
+  inflight: Promise<void> | null;
 
   state: State = {
     input: '',
@@ -62,6 +62,7 @@ export class NewCard extends React.Component<Props, State> {
         if (current !== this.inflight) {
           return;
         }
+        this.inflight = null;
         this.setState({ results, pending: false });
       })
       .catch(console.error);
@@ -94,6 +95,7 @@ export class NewCard extends React.Component<Props, State> {
                   this.search(term);
                   this.setState({ input: term });
                 } else {
+                  this.inflight = null;
                   this.search.cancel();
                   this.setState({ input: '', results: null, pending: false });
                 }
