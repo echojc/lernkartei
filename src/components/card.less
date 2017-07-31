@@ -3,6 +3,7 @@
 .card {
   position: relative;
   width: 100%;
+  height: @card-height;
   box-sizing: border-box;
   background: @white;
   border: 1px solid @light-gray;
@@ -41,8 +42,8 @@
   perspective: 800px;
 }
 
-@media (min-width: 360px) {
+@media (min-width: @card-width) {
   .container {
-    width: 360px;
+    width: @card-width;
   }
 }
