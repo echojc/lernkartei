@@ -1,4 +1,4 @@
-import { uniqBy } from 'lodash';
+import { findIndex } from 'lodash';
 import * as React from 'react';
 
 import { Search } from 'components/Search';
@@ -28,8 +28,21 @@ export class App extends React.Component<{}, {}> {
   };
 
   add = (front: string, back: string[]) => {
+    const newCard = {
+      isNew: true,
+      front,
+      back,
+    };
+
     const { cards } = this.state;
-    this.setState({ cards: [{ isNew: true, front, back }].concat(cards) });
+    const existingIndex = findIndex(cards, c => key(c) === key(newCard));
+    if (existingIndex < 0) {
+      this.setState({ cards: [newCard].concat(cards) });
+    } else {
+      const before = cards.slice(0, existingIndex);
+      const after = cards.slice(existingIndex + 1);
+      this.setState({ cards: [newCard].concat(before).concat(after) });
+    }
   }
 
   render() {
@@ -38,8 +51,13 @@ export class App extends React.Component<{}, {}> {
       <div>
         <main>
           <Search add={this.add} />
-          {uniqBy(cards, key).map(card => (
-            <WordCard key={key(card)} front={card.front} back={card.back} disableAnimate={!card.isNew} />
+          {cards.map(card => (
+            <WordCard
+              key={key(card)}
+              front={card.front}
+              back={card.back}
+              disableAnimate={!card.isNew}
+            />
           ))}
         </main>
       </div>
