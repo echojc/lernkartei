@@ -1,8 +1,8 @@
 import { findIndex } from 'lodash';
 import * as React from 'react';
 
+import { Grid } from 'components/Grid';
 import { Search } from 'components/Search';
-import { WordCard } from 'components/WordCard';
 
 interface Card {
   front: string;
@@ -51,14 +51,7 @@ export class App extends React.Component<{}, {}> {
       <div>
         <main>
           <Search add={this.add} />
-          {cards.map(card => (
-            <WordCard
-              key={key(card)}
-              front={card.front}
-              back={card.back}
-              disableAnimate={!card.isNew}
-            />
-          ))}
+          <Grid cards={cards} />
         </main>
       </div>
     );
