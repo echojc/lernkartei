@@ -21,6 +21,7 @@ function key(card: Card): string {
 
 const ResponsiveGrid = makeResponsive(SpringGrid, {
   maxWidth: 1920,
+  minPadding: 40,
   defaultColumns: 1,
 });
 

@@ -18,31 +18,43 @@ function key(card: Card): string {
   return card.front + card.back.join();
 }
 
-export class App extends React.Component<{}, {}> {
-  state: State = {
-    cards: [
-      { isNew: false, front: 'go',   back: ['gehen', 'geht', 'ging', 'gegangen sein'] },
-      { isNew: false, front: 'good', back: ['gut', 'besser', 'am besten'] },
-      { isNew: false, front: 'dog',  back: ['der Hund', 'die Hunde'] },
-    ],
-  };
+function deserialize(s: string): Card[] {
+  try {
+    const cards = JSON.parse(s);
+    cards.forEach((c: Card) => c.isNew = false);
+    return cards;
+  } catch (e) {
+    // tslint:disable-next-line
+    console.error(e);
+    return [];
+  }
+}
+
+export class App extends React.Component<{}, State> {
+  constructor(props: {}) {
+    super(props);
+    const data = localStorage.getItem('cards');
+    const cards = data ? deserialize(data) : [];
+    this.state = {
+      cards,
+    };
+  }
 
   add = (front: string, back: string[]) => {
+    const { cards } = this.state;
     const newCard = {
       isNew: true,
       front,
       back,
     };
 
-    const { cards } = this.state;
     const existingIndex = findIndex(cards, c => key(c) === key(newCard));
-    if (existingIndex < 0) {
-      this.setState({ cards: [newCard].concat(cards) });
-    } else {
-      const before = cards.slice(0, existingIndex);
-      const after = cards.slice(existingIndex + 1);
-      this.setState({ cards: [newCard].concat(before).concat(after) });
-    }
+    const newCards = existingIndex < 0
+      ? [newCard].concat(cards)
+      : [newCard].concat(cards.slice(0, existingIndex)).concat(cards.slice(existingIndex + 1));
+
+    localStorage.setItem('cards', JSON.stringify(newCards));
+    this.setState({ cards: newCards });
   }
 
   render() {
