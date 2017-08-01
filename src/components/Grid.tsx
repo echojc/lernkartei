@@ -8,7 +8,7 @@ import * as styles from './grid.less';
 interface Card {
   front: string;
   back: string[];
-  isNew: boolean;
+  isNew?: boolean;
 }
 
 interface Props {
