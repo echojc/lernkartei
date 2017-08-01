@@ -31,8 +31,8 @@ export class Grid extends React.Component<Props, {}> {
     return (
       <ResponsiveGrid
         className={styles.grid}
-        columnWidth={320}
-        itemHeight={200}
+        columnWidth={280}
+        itemHeight={160}
         gutterWidth={20}
         gutterHeight={20}
         springConfig={{ stiffness: 170, damping: 22 }}

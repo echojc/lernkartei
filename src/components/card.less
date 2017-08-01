@@ -35,13 +35,7 @@
 }
 
 .container {
-  width: 100%;
+  width: @card-width;
   box-sizing: border-box;
   perspective: 800px;
-}
-
-@media (min-width: @card-width) {
-  .container {
-    width: @card-width;
-  }
 }
