@@ -26,7 +26,7 @@
       const key = Array.from(e.target.value.toLowerCase()).map(_=>_.charCodeAt()).concat(Array(16).fill(0)).slice(0,16);
       const decrypted = aesjs.utils.utf8.fromBytes((new aesjs.ModeOfOperation.ctr(key)).decrypt(payload));
       if (decrypted.includes('PVQ1VA')) {
-        document.body.innerHTML = '<div>Success!</div>';
+        document.body.innerHTML = '<div>You did it!</div>';
         setTimeout(() => {
           document.body.innerHTML = decrypted;
         }, 2000);
