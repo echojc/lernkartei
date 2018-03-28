@@ -1,0 +1,36 @@
+<!doctype html>
+<head>
+  <style>
+    html,body,iframe{width:100%;height:100%;border:0;margin:0;padding:0;overflow:hidden;display:flex;justify-content:center;align-items:center;flex-direction:column}
+    p{font-style:italic}
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/aes-js/3.1.0/index.min.js"></script>
+</head>
+<body>
+  <p>
+    First think of the person who lives in disguise,<br/>
+    Who deals in secrets and tells naught but lies.<br/>
+    Next, tell me what's always the last thing to mend,<br/>
+    The middle of middle and end of the end?<br/>
+    And finally give me the sound often heard<br/>
+    During the search for a hard-to-find word.<br/>
+    Now string them together, and answer me this,<br/>
+    Which creature would you be unwilling to kiss?<br/>
+  </p>
+  <p>
+    <input id="i"/>
+  </p>
+  <script>
+    const payload = new Uint8Array([17, 44, 202, 201, 116, 192, 192, 174, 211, 95, 238, 160, 126, 175, 237, 45, 5, 137, 204, 123, 97, 20, 7, 80, 86, 86, 114, 200, 65, 132, 162, 136, 169, 78, 145, 123, 37, 128, 124, 127, 202, 248, 203, 131, 78, 96, 174, 243, 230, 100, 86, 201, 35, 138, 132, 166, 183, 215, 104, 205, 203, 171, 155, 6, 246, 180, 94, 113, 36, 247, 73, 152, 105, 29, 142, 58, 201, 11, 117, 119, 241, 94, 235, 93, 182]);
+    document.getElementById('i').addEventListener('input', e => {
+      const key = Array.from(e.target.value.toLowerCase()).map(_=>_.charCodeAt()).concat(Array(16).fill(0)).slice(0,16);
+      const decrypted = aesjs.utils.utf8.fromBytes((new aesjs.ModeOfOperation.ctr(key)).decrypt(payload));
+      if (decrypted.includes('PVQ1VA')) {
+        document.body.innerHTML = '<div>Success!</div>';
+        setTimeout(() => {
+          document.body.innerHTML = decrypted;
+        }, 2000);
+      }
+    });
+  </script>
+</body>
